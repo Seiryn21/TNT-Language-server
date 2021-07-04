@@ -4,4 +4,4 @@
 
 ### Changes
 
-this is the intitial version, the tls support all TNT derivation, provide a visual representation of the derivation and a bit of autocompletion.
+this is the intitial version, the tls provide syntax analysis, a bit of autocompletion and a tool for proof exploration.
