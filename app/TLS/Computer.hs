@@ -34,7 +34,7 @@ diagnosticAlreadyProven :: LSP.Range -> LSP.Diagnostic
 diagnosticAlreadyProven range = LSP.Diagnostic range (Just LSP.DsInfo) Nothing (Just "TNT-prover") "Theorem is already proven" Nothing Nothing
 
 computeInstr :: Int -> Scope -> InstrBlock -> Either (Scope, [Line]) (LSP.Range, T.Text)
-computeInstr _ sc (Nothing, range,_ ) = Left (sc, [Line (Just range) "" True])
+computeInstr _   sc (Nothing, range,_ ) = Left (sc, [Line (Just range) "" True])
 computeInstr ind sc@(Scope _ _ n l _) (Just f,displayRange,errRange) = case f sc of
   (Scope _ _ _ _ ((_,Error error):lines)) -> Right (errRange, error)
   sc@(Scope _ _ n' l' ((_, f):_)) -> Left (sc, case compare l l' of
@@ -50,6 +50,7 @@ computeTheorem sc (Theorem r r' id f instrs) = let ind = length $ show $ length 
                                                      computeTheorem' ind sc True lines  ((Just _, _, range):_) = (Just $ diagnosticAlreadyProven range, True, ComputedTheorem (Just r') (Just lines))
                                                      computeTheorem' ind sc _ lines (instr:instrs) = case computeInstr ind sc instr of
                                                          Right (range, error) -> (Just $ diagnosticsFromError range error, False, ComputedTheorem (Just r') (Just lines))
+                                                         Left (sc'@(Scope _ _ _ l []), lines') -> computeTheorem' ind sc' False (lines++lines') instrs
                                                          Left (sc'@(Scope _ _ _ l ((_,f'):_)), lines') -> if l == 0 && f == f'
                                                                                                           then computeTheorem' ind sc' True (lines++lines') instrs
                                                                                                           else computeTheorem' ind sc' False (lines++lines') instrs

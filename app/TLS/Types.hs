@@ -106,4 +106,6 @@ instrs = [ "axiom"
          , "removeDoubleNeg"
          , "notOrToAndNot"
          , "andNotToNotOr"
+         , "notExistToForallNot"
+         , "forallNotToNotExist"
          ]

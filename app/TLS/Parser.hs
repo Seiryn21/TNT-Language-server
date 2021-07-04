@@ -265,6 +265,60 @@ parseRecurence = do keyword "recurence"
                     spaces
                     recurence m n <$> parseFormula
 
+parseAddDoubleNeg :: Parser Instr
+parseAddDoubleNeg = do keyword "addDoubleNeg"
+                       spaces
+                       m <- number
+                       spaces
+                       f <- parseFormula
+                       spaces
+                       addDoubleNeg m f <$> number
+
+parseRemoveDoubleNeg :: Parser Instr 
+parseRemoveDoubleNeg = do keyword "removeDoubleNeg"
+                          spaces
+                          m <- number
+                          spaces
+                          f <- parseFormula
+                          spaces
+                          removeDoubleNeg m f <$> number
+
+parseNotOrToAndNot :: Parser Instr
+parseNotOrToAndNot = do keyword "notOrToAndNot"
+                        spaces
+                        m <- number
+                        spaces
+                        f <- parseFormula
+                        spaces
+                        notOrToAndNot m f <$> number
+ 
+parseAndNotToNotOr :: Parser Instr
+parseAndNotToNotOr = do keyword "andNotToNotOr"
+                        spaces
+                        m <- number
+                        spaces
+                        f <- parseFormula
+                        spaces
+                        andNotToNotOr m f <$> number
+
+parseNotExistToForallNot :: Parser Instr
+parseNotExistToForallNot = do keyword "notExistToForallNot"
+                              spaces
+                              m <- number
+                              spaces
+                              f <- parseFormula
+                              spaces
+                              notExistToForallNot m f <$> number
+
+parseForallNotToNotExist :: Parser Instr
+parseForallNotToNotExist = do keyword "forallNotToNotExist"
+                              spaces
+                              m <- number
+                              spaces
+                              f <- parseFormula
+                              spaces
+                              forallNotToNotExist m f <$> number
+
 parseInstr :: Parser Instr
 parseInstr = parseAxiom
          <|> parseAddTheorem
@@ -282,6 +336,12 @@ parseInstr = parseAxiom
          <|> parseGeneralize
          <|> parseExistence
          <|> parseRecurence
+         <|> parseAddDoubleNeg
+         <|> parseRemoveDoubleNeg
+         <|> parseNotOrToAndNot
+         <|> parseAndNotToNotOr
+         <|> parseNotExistToForallNot
+         <|> parseForallNotToNotExist
          <?> "command"
 
 parseInstrBlock :: Parser InstrBlock

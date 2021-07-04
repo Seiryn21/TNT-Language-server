@@ -1,5 +1,13 @@
 # Changelog for TNT-language-server
 
+## 0.2.0.0
+
+### Changes
+
+Solve issue with empty theorem proof
+
+Add last commands for derivation.
+
 ## 0.1.0.0
 
 ### Changes

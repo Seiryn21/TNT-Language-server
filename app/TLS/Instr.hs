@@ -271,34 +271,50 @@ replaceNth s r t (Just n) = if t == s
                                                   let (n'', f2') = replaceNth s r f2 n' in
                                                   (n'', Implie f1' f2')
 
-addDoubleNeg :: Int -> Formula -> Scope -> Scope
-addDoubleNeg n f sc = case getFromScope sc n of
-                        Nothing -> outOfScope sc
-                        Just f' -> case replaceNth f (Not (Not f)) f' (Just n) of
-                                    (Just n, _) -> addError "Can't find specified occurence" sc
-                                    (Nothing, f'') -> addToScope f'' sc
+addDoubleNeg :: Int -> Formula -> Int -> Scope -> Scope
+addDoubleNeg n f m sc = case getFromScope sc n of
+                            Nothing -> outOfScope sc
+                            Just f' -> case replaceNth f (Not (Not f)) f' (Just m) of
+                                        (Just n, _) -> addError "Can't find specified occurence" sc
+                                        (Nothing, f'') -> addToScope f'' sc
 
-removeDoubleNeg :: Int -> Formula -> Scope -> Scope
-removeDoubleNeg n (Not (Not f)) sc = case getFromScope sc n of
-                                      Nothing -> outOfScope sc
-                                      Just f' -> case replaceNth (Not (Not f)) f f' (Just n) of
+removeDoubleNeg :: Int -> Formula -> Int -> Scope -> Scope
+removeDoubleNeg n (Not (Not f)) m sc = case getFromScope sc n of
+                                        Nothing -> outOfScope sc
+                                        Just f' -> case replaceNth (Not (Not f)) f f' (Just m) of
                                                     (Just _, _) -> addError "Can't find specified occurence" sc
                                                     (Nothing, f'') -> addToScope f'' sc
-removeDoubleNeg n f sc = addError "Formula must begin by two negation" sc
+removeDoubleNeg n f m sc = addError "Formula must begin by two negation" sc
 
-notOrToAndNot :: Int -> Formula -> Scope -> Scope
-notOrToAndNot n (Not (Or f1 f2)) sc = case getFromScope sc n of
+notOrToAndNot :: Int -> Formula -> Int -> Scope -> Scope
+notOrToAndNot n (Not (Or f1 f2)) m sc = case getFromScope sc n of
                                         Nothing -> outOfScope sc
-                                        Just f -> case replaceNth (Not (Or f1 f2)) (And (Not f1) (Not f2)) f (Just n) of
+                                        Just f -> case replaceNth (Not (Or f1 f2)) (And (Not f1) (Not f2)) f (Just m) of
                                             (Just _, _) -> addError "Can't find specified occurence" sc
                                             (Nothing, f') -> addToScope f' sc
-notOrToAndNot n f sc = addError "Formula must be the negation of an or formula" sc
+notOrToAndNot n f m sc = addError "Formula must be the negation of an or formula" sc
 
-andNotToNotOr :: Int -> Formula -> Scope -> Scope
-andNotToNotOr n (And (Not f1) (Not f2)) sc = case getFromScope sc n of
-                                              Nothing -> outOfScope sc
-                                              Just f -> case replaceNth (And (Not f1) (Not f2)) (Not (Or f1 f2)) f (Just n) of
-                                                (Just _, _) -> addError "Can't find specified occurence" sc
-                                                (Nothing, f') -> addToScope f' sc
-andNotToNotOr n f sc = addError "Formula must be the negation of an or formula" sc
+andNotToNotOr :: Int -> Formula -> Int -> Scope -> Scope
+andNotToNotOr n (And (Not f1) (Not f2)) m sc = case getFromScope sc n of
+                                                Nothing -> outOfScope sc
+                                                Just f -> case replaceNth (And (Not f1) (Not f2)) (Not (Or f1 f2)) f (Just m) of
+                                                    (Just _, _) -> addError "Can't find specified occurence" sc
+                                                    (Nothing, f') -> addToScope f' sc
+andNotToNotOr n f m sc = addError "Formula must be the negation of an or formula" sc
+
+notExistToForallNot :: Int -> Formula -> Int -> Scope -> Scope
+notExistToForallNot n (Not (Exist v f)) m sc = case getFromScope sc n of
+                                                Nothing -> outOfScope sc
+                                                Just f' -> case replaceNth (Not (Exist v f)) (Forall v (Not f)) f' (Just m) of
+                                                            (Just _, _) -> addError "Can't find specified occurence" sc
+                                                            (Nothing , f'') -> addToScope f'' sc
+notExistToForallNot n f m sc = addError "Formula must begin by not exist" sc
+
+forallNotToNotExist :: Int -> Formula -> Int -> Scope -> Scope
+forallNotToNotExist n (Forall v (Not f)) m sc = case getFromScope sc n of
+                                                    Nothing -> outOfScope sc
+                                                    Just f' -> case replaceNth (Forall v (Not f)) (Not (Exist v f)) f' (Just m) of
+                                                                (Just _, _) -> addError "Can't find specified occurence" sc
+                                                                (Nothing , f'') -> addToScope f'' sc
+forallNotToNotExist n f m sc = addError "Formula must begin by not exist" sc
 
