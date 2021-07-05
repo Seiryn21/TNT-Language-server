@@ -62,7 +62,10 @@ instance Show Formula where
 
 type Lines = [(Int, Formula)]
 
-data Scope = Scope (Map.Map Identifier (Maybe Formula)) (Maybe Scope) Int Int Lines
+data Scope = Scope (Map.Map Identifier (Maybe Formula)) (Maybe Scope) Int Int Lines deriving (Eq, Show)
+
+emptyScope :: Scope
+emptyScope = Scope Map.empty Nothing 1 0 []
 
 type Instr = (Scope -> Scope)
 

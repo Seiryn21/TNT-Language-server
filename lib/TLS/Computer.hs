@@ -9,9 +9,6 @@ import qualified Language.LSP.Types as LSP
 import           Text.Printf
 import           TLS.Types
 
-emptyScope :: Scope
-emptyScope = Scope Map.empty Nothing 1 0 []
-
 addTheoremToScope :: Scope -> Identifier -> Maybe Formula -> Scope
 addTheoremToScope (Scope map sc n l lines) name theorem = Scope (Map.insert name theorem map) sc n l lines
 
