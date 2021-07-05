@@ -1,5 +1,10 @@
 # Changelog for TNT-language-server
 
+## 0.3.0.0
+
+Solve issue with removeSucc operation.
+Begin adding unit tests.
+
 ## 0.2.0.0
 
 ### Changes

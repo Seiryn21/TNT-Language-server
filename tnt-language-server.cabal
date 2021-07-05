@@ -1,6 +1,6 @@
 cabal-version:      2.4
 name:               tnt-language-server
-version:            0.2.0.0
+version:            0.3.0.0
 synopsis:           A TNT proof assistant and LSP server
 
 author:             Alice Laroche

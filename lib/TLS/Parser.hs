@@ -202,7 +202,7 @@ parseAddSucc = do keyword "addSucc"
                   addSucc <$> number
 
 parseRemoveSucc :: Parser Instr
-parseRemoveSucc = do keyword "addSucc"
+parseRemoveSucc = do keyword "removeSucc"
                      spaces
                      removeSucc <$> number
 
