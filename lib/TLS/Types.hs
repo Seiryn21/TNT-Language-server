@@ -6,7 +6,7 @@
 module TLS.Types where
 
 import           GHC.Generics
-import           Data.Aeson
+import qualified Data.Aeson         as Aeson
 import qualified Data.Map           as Map
 import qualified Data.Text          as T
 import qualified Language.LSP.Types as LSP
@@ -34,6 +34,7 @@ data Formula = Eq Term Term
              | Forall Var Formula
              | Exist Var Formula
              | Error T.Text
+             | Warning T.Text Formula
              deriving (Eq)
 
 instance Show Var where
@@ -59,10 +60,12 @@ instance Show Formula where
   show (Implie f1 f2) = "<" ++ show f1 ++ "⊂" ++ show f2 ++ ">"
   show (Forall v f) = "∀" ++ show v ++ ":" ++ show f
   show (Exist v f) = "∃" ++ show v ++ ":" ++ show f
+  show (Error e) = "Error : " ++ T.unpack e
+  show (Warning w f) = "Warning : " ++ T.unpack w ++ " " ++ show f
 
 type Lines = [(Int, Formula)]
 
-data Scope = Scope (Map.Map Identifier (Maybe Formula)) (Maybe Scope) Int Int Lines deriving (Eq, Show)
+data Scope = Scope (Map.Map Identifier (Bool,Formula)) (Maybe Scope) Int Int Lines deriving (Eq, Show)
 
 emptyScope :: Scope
 emptyScope = Scope Map.empty Nothing 1 0 []
@@ -77,14 +80,15 @@ data Theorem = Theorem LSP.Range LSP.Range Identifier Formula [InstrBlock]
 
 instance Show Theorem where
     show (Theorem _ _ id f _ ) = show id ++ " " ++ show f
+
 data Line = Line { range :: Maybe LSP.Range
                  , display :: T.Text
                  , empty :: Bool
-                 } deriving (Generic, ToJSON, Show)
+                 } deriving (Generic, Aeson.ToJSON, Show)
 
 data ComputedTheorem = ComputedTheorem { range :: Maybe LSP.Range
                                        , lines :: Maybe [Line]
-                                       } deriving (Generic, ToJSON, Show)
+                                       } deriving (Generic, Aeson.ToJSON, Show)
 
 type ParsedFile = [ComputedTheorem]
 

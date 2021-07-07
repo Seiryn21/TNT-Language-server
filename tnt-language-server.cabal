@@ -24,6 +24,7 @@ library tls
                     , TLS.Parser
                     , TLS.Tokenizer
                     , TLS.Types 
+                    , TLS.Errors
     hs-source-dirs:   lib
     default-language: Haskell2010
 

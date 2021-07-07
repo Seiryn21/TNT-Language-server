@@ -8,6 +8,7 @@ import           Data.List
 import qualified Data.Map as Map
 import qualified Data.Text as T
 import           TLS.Types
+import           TLS.Errors
 
 getFromLines :: Lines -> Int -> Maybe Formula
 getFromLines [] _ = Nothing
@@ -23,6 +24,9 @@ addToScope f (Scope ths sc n l lines) = Scope ths sc (n+1) l ((n, f):lines)
 addError :: T.Text -> Scope -> Scope
 addError e (Scope ths sc n l lines) = Scope ths sc (n+1) l ((n, Error e):lines)
 
+addWarning :: T.Text -> Formula -> Scope -> Scope
+addWarning e f (Scope ths sc n l lines) = Scope ths sc (n+1) l ((n, Warning e f):lines)
+
 axiom :: Int -> Scope -> Scope
 axiom n
   | n == 1 = addToScope $ Forall A $ Not $ Eq (Succ (Var A)) Zero
@@ -30,13 +34,13 @@ axiom n
   | n == 3 = addToScope $ Forall A $ Forall B $ Eq (Add (Var A) (Succ $ Var B)) (Succ $ Add (Var A) (Var B))
   | n == 4 = addToScope $ Forall A $ Eq (Mul (Var A) Zero) Zero
   | n == 5 = addToScope $ Forall A $ Forall B $ Eq (Mul (Var A) (Succ $ Var B)) (Add (Mul (Var A) (Var B)) (Var A))
-  | otherwise = addError "Axiom number must be between 1 and 5 inclusive"
+  | otherwise = addError axiomRangeError
 
 theorem :: Identifier -> Scope -> Scope
 theorem id sc@(Scope map _ _ _ _) = case Map.lookup id map of
-                                      Nothing -> addError "Theorem must be declared above to avoid cyclic reference" sc
-                                      Just Nothing  -> addError "Theorem is not proven" sc
-                                      Just (Just f) -> addToScope f sc
+                                      Nothing -> addError theoremMeBeDeclaredAboveError sc
+                                      Just (False, f) -> addWarning theoremUnprovenWarning f sc
+                                      Just (True,  f) -> addToScope f sc
 
 openFantasy :: Formula -> Scope -> Scope
 openFantasy f sc@(Scope ths _ n l _) = addToScope f (Scope ths (Just sc) n (l+1) [])
