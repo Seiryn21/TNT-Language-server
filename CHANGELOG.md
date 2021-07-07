@@ -1,5 +1,10 @@
 # Changelog for TNT-language-server
 
+## 0.4.0.0
+
+Change diagnostic version.
+Add unit test for theorem
+
 ## 0.3.0.0
 
 Solve issue with removeSucc operation.
